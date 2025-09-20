@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Virtual environments
+jetson-env/
+mcp_env/
+venv/
+env/
+
+# Node.js
+node_modules/
+npm-debug.log*
+.npm
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.cursor/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.o
+*.exe
+phase3_frontend
+phase3_frontend_test
+
+# Temporary files
+*.tmp
+*.temp
