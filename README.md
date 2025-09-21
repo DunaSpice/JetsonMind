@@ -5,7 +5,7 @@
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat&logo=docker)](https://docker.com)
 [![MCP](https://img.shields.io/badge/MCP-Integrated-FF6B6B?style=flat)](https://modelcontextprotocol.io)
 [![MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Architecture](https://img.shields.io/badge/Docs-Architecture-blue.svg)](ARCHITECTURE_DIAGRAM.md)
+[![Architecture](https://img.shields.io/badge/Docs-Architecture-blue.svg)](docs/reference/ARCHITECTURE_DIAGRAM.md)
 
 > **Complete edge AI ecosystem for NVIDIA Jetson devices with production-ready inference, MCP protocol integration, and comprehensive hardware optimization.**
 
