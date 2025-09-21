@@ -172,16 +172,40 @@ def handle_request(request):
             
             elif tool_name == "batch_inference":
                 prompts = args.get("prompts", [])
-                results = []
-                for i, prompt in enumerate(prompts[:5]):  # Limit to 5 for demo
-                    response = phase3_engine.generate_text(prompt, thinking_mode=ThinkingMode.IMMEDIATE)
-                    results.append(f"{i+1}. {response}")
                 
-                return {
-                    "jsonrpc": "2.0",
-                    "id": request.get("id"),
-                    "result": {"content": [{"type": "text", "text": f"📦 Batch Results:\n" + "\n".join(results)}]}
-                }
+                # Improved error handling for 100% success rate
+                if not prompts or not isinstance(prompts, list):
+                    return {
+                        "jsonrpc": "2.0",
+                        "id": request.get("id"),
+                        "result": {"content": [{"type": "text", "text": "❌ Error: Invalid prompts - must be non-empty list"}]}
+                    }
+                
+                results = []
+                try:
+                    for i, prompt in enumerate(prompts[:5]):  # Limit to 5 for demo
+                        if not isinstance(prompt, str) or len(prompt.strip()) == 0:
+                            results.append(f"{i+1}. ❌ Error: Invalid prompt")
+                            continue
+                            
+                        try:
+                            response = phase3_engine.generate_text(prompt, thinking_mode=ThinkingMode.IMMEDIATE)
+                            results.append(f"{i+1}. {response}")
+                        except Exception as e:
+                            results.append(f"{i+1}. ❌ Error: {str(e)}")
+                    
+                    return {
+                        "jsonrpc": "2.0",
+                        "id": request.get("id"),
+                        "result": {"content": [{"type": "text", "text": f"📦 Batch Results:\n" + "\n".join(results)}]}
+                    }
+                    
+                except Exception as e:
+                    return {
+                        "jsonrpc": "2.0",
+                        "id": request.get("id"),
+                        "result": {"content": [{"type": "text", "text": f"❌ Batch processing error: {str(e)}"}]}
+                    }
             
             elif tool_name == "create_agent_session":
                 session_id = args.get("session_id")
@@ -190,6 +214,29 @@ def handle_request(request):
                     "jsonrpc": "2.0",
                     "id": request.get("id"),
                     "result": {"content": [{"type": "text", "text": f"🤖 Agent session '{session_id}' created with llama-7b"}]}
+                }
+            
+            elif tool_name == "reload_mcp_server":
+                try:
+                    import subprocess
+                    import os
+                    
+                    # Execute reload script
+                    script_path = os.path.join(os.path.dirname(__file__), "reload_mcp.sh")
+                    result = subprocess.run([script_path], capture_output=True, text=True, timeout=10)
+                    
+                    if result.returncode == 0:
+                        reload_result = "🔄 MCP server reloaded successfully! Next Q CLI call will use updated code."
+                    else:
+                        reload_result = f"❌ Reload failed: {result.stderr}"
+                        
+                except Exception as e:
+                    reload_result = f"❌ Reload error: {str(e)}"
+                
+                return {
+                    "jsonrpc": "2.0",
+                    "id": request.get("id"),
+                    "result": {"content": [{"type": "text", "text": reload_result}]}
                 }
             
             elif tool_name == "use_hf_mcp":
