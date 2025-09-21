@@ -41,21 +41,21 @@
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**📋 [Complete Architecture Diagram](ARCHITECTURE_DIAGRAM.md)** | **📊 [Detailed System Outline](SYSTEM_OUTLINE.md)**
+**📋 [Complete Architecture Diagram](docs/reference/ARCHITECTURE_DIAGRAM.md)** | **📊 [Detailed System Outline](docs/reference/SYSTEM_OUTLINE.md)**
 
 ## 🚀 Quick Start
 
 ```bash
-# 🎯 Recommended: Start with Phase 3 Production System
-cd jetson/phase3 && ./setup.sh && python3 test_comprehensive.py
+# 🎯 Recommended: Start with Core Production System
+cd jetson/core && ./setup.sh && python3 test_comprehensive.py
 
 # 🏗️ Alternative: Explore complete architecture first
-cat ARCHITECTURE_DIAGRAM.md && cat SYSTEM_OUTLINE.md
+cat docs/reference/ARCHITECTURE_DIAGRAM.md && cat docs/reference/SYSTEM_OUTLINE.md
 ```
 
 ## 📦 Repository Components
 
-### 🧠 Phase 3 MCP Server (`phase3/`) - **PRODUCTION READY** ⭐
+### 🧠 Core Production System (`core/`) - **PRODUCTION READY** ⭐
 **The flagship production system** - Start here for immediate deployment
 - **Status**: ✅ Operational (loads in <1s, 99.9%+ reliability)
 - **MCP Server**: Robust JSON-RPC 2.0 interface for CLI integration
@@ -65,17 +65,17 @@ cat ARCHITECTURE_DIAGRAM.md && cat SYSTEM_OUTLINE.md
 
 **Quick Commands:**
 ```bash
-cd phase3 && ./setup.sh                    # Complete setup
+cd core && ./setup.sh                      # Complete setup
 python3 test_comprehensive.py              # Validate system
 python3 mcp_server_minimal.py             # Start MCP server
 ```
 
 ### 🏗️ Architecture Documentation - **COMPREHENSIVE** 📋
 **Complete system design and operational guides** - Essential for understanding
-- **[Architecture Diagram](ARCHITECTURE_DIAGRAM.md)**: Visual system design with ASCII diagrams
-- **[System Outline](SYSTEM_OUTLINE.md)**: Detailed operational procedures and specs
-- **[Feature Matrix](FEATURES.md)**: Current capabilities vs future roadmap
-- **[Compatibility Matrix](COMPATIBILITY.md)**: Hardware support across all Jetson devices
+- **[Architecture Diagram](docs/reference/ARCHITECTURE_DIAGRAM.md)**: Visual system design with ASCII diagrams
+- **[System Outline](docs/reference/SYSTEM_OUTLINE.md)**: Detailed operational procedures and specs
+- **[Feature Matrix](docs/reference/FEATURES.md)**: Current capabilities vs future roadmap
+- **[Compatibility Matrix](docs/reference/COMPATIBILITY.md)**: Hardware support across all Jetson devices
 
 ### 🐳 Jetson Containers (`jetson-containers/`) - **HARDWARE OPTIMIZED**
 **Official NVIDIA container ecosystem** - Maximum performance deployment
@@ -90,7 +90,7 @@ cd jetson-containers && ./install.sh       # Install container system
 ./run.sh --container pytorch              # Launch PyTorch container
 ```
 
-### 🌐 Web System (`from_jetson_web/`) - **ALTERNATIVE INTERFACE**
+### 🌐 Web System (`legacy/web-system/`) - **ALTERNATIVE INTERFACE**
 **Web-based AI system** - Browser interface and REST API access
 - **Phase 1**: Basic inference system with web UI
 - **Phase 2**: Advanced model management and batch processing
@@ -99,8 +99,8 @@ cd jetson-containers && ./install.sh       # Install container system
 
 **Quick Commands:**
 ```bash
-cd from_jetson_web && docker-compose up   # Launch web interface
-curl localhost:8080/api/generate          # Test REST API
+cd legacy/web-system && docker-compose up  # Launch web interface
+curl localhost:8080/api/generate           # Test REST API
 ```
 
 ### 🔧 Development Environment (`jetson-env/`) - **ISOLATED SETUP**
@@ -127,37 +127,37 @@ curl localhost:8080/api/generate          # Test REST API
 | **Jetson Xavier NX** | 8GB | 384 | ✅ | ✅ | ✅ | ⭐⭐⭐⭐ |
 | **Jetson AGX Orin** | 32/64GB | 2048 | ✅ | ✅ | ✅ | ⭐⭐⭐⭐⭐ |
 
-**📋 [Complete Compatibility Matrix](COMPATIBILITY.md)** | **🎯 [Feature Comparison](FEATURES.md)**
+**📋 [Complete Compatibility Matrix](docs/reference/COMPATIBILITY.md)** | **🎯 [Feature Comparison](docs/reference/FEATURES.md)**
 
 ## 📚 Complete Documentation Hub
 
 ### 🎯 Quick Start Paths
 | User Type | Start Here | Next Steps |
 |-----------|------------|------------|
-| **New Users** | [Getting Started](docs/01-GETTING-STARTED.md) | → [Phase 3 Setup](phase3/README.md) |
-| **Developers** | [Architecture](ARCHITECTURE_DIAGRAM.md) | → [API Reference](docs/09-API-REFERENCE.md) |
-| **DevOps** | [Deployment](DEPLOYMENT.md) | → [Testing Guide](docs/06-TESTING.md) |
+| **New Users** | [Getting Started](docs/01-GETTING-STARTED.md) | → [Core Setup](core/README.md) |
+| **Developers** | [Architecture](docs/reference/ARCHITECTURE_DIAGRAM.md) | → [API Reference](docs/09-API-REFERENCE.md) |
+| **DevOps** | [Deployment](docs/guides/DEPLOYMENT.md) | → [Testing Guide](docs/06-TESTING.md) |
 | **Troubleshooters** | [Troubleshooting](docs/08-TROUBLESHOOTING.md) | → [Development Notes](docs/10-DEVELOPMENT-NOTES.md) |
 
 ### 📖 Core Documentation
-- **[📋 Architecture Diagram](ARCHITECTURE_DIAGRAM.md)** - Visual system design with ASCII diagrams
-- **[📊 System Outline](SYSTEM_OUTLINE.md)** - Complete operational procedures and specifications
-- **[🎯 Feature Matrix](FEATURES.md)** - Current capabilities vs future roadmap through 2025
-- **[🔧 Compatibility Matrix](COMPATIBILITY.md)** - Hardware support across all Jetson devices
+- **[📋 Architecture Diagram](docs/reference/ARCHITECTURE_DIAGRAM.md)** - Visual system design with ASCII diagrams
+- **[📊 System Outline](docs/reference/SYSTEM_OUTLINE.md)** - Complete operational procedures and specifications
+- **[🎯 Feature Matrix](docs/reference/FEATURES.md)** - Current capabilities vs future roadmap through 2025
+- **[🔧 Compatibility Matrix](docs/reference/COMPATIBILITY.md)** - Hardware support across all Jetson devices
 - **[🚀 Getting Started](docs/01-GETTING-STARTED.md)** - Installation and first steps
 - **[🏗️ Architecture Guide](docs/02-ARCHITECTURE.md)** - System design and components  
 - **[📚 API Reference](docs/09-API-REFERENCE.md)** - Complete tool specifications
 - **[🔧 Troubleshooting](docs/08-TROUBLESHOOTING.md)** - Common issues and solutions
 
 ### 🎯 Component Documentation  
-- **[Phase 3 MCP Server](phase3/README.md)** - Production system (RECOMMENDED)
+- **[Core Production System](core/README.md)** - Production system (RECOMMENDED)
 - **[Jetson Containers](jetson-containers/README.md)** - Hardware acceleration
-- **[Web System](from_jetson_web/README.md)** - Web interface components
+- **[Web System](legacy/web-system/README.md)** - Web interface components
 - **[Environment Setup](jetson-env/README.md)** - Python environment
 
 ### 📋 Planning & Roadmap
-- **[Phase 4 Plan](PHASE4_PLAN.md)** - Current development roadmap
-- **[Deployment Guide](DEPLOYMENT.md)** - Production deployment strategies
+- **[Phase 4 Plan](docs/guides/PHASE4_PLAN.md)** - Current development roadmap
+- **[Deployment Guide](docs/guides/DEPLOYMENT.md)** - Production deployment strategies
 
 ## 🚀 Key Features & Capabilities
 
@@ -244,12 +244,12 @@ Jetson Optimized     6.1GB      <3s          Maximum Performance
 ### 📞 Getting Help
 - **Documentation**: Start with [Getting Started](docs/01-GETTING-STARTED.md)
 - **Troubleshooting**: Check [common issues](docs/08-TROUBLESHOOTING.md)
-- **Architecture**: Review [system design](ARCHITECTURE_DIAGRAM.md)
+- **Architecture**: Review [system design](docs/reference/ARCHITECTURE_DIAGRAM.md)
 - **API Reference**: Complete [tool specifications](docs/09-API-REFERENCE.md)
 
 ---
 *Complete Jetson AI System - Updated: 2025-09-20 22:24*
-*📋 Start with Phase 3: `cd phase3 && cat README.md`*
+*📋 Start with Core: `cd core && cat README.md`*
 
 ## 🏷️ Topics
 `nvidia-jetson` `edge-ai` `machine-learning` `docker` `mcp-protocol` `inference-engine` `cuda` `tensorrt` `python` `ai-deployment` `edge-computing` `production-ready`
