@@ -13,8 +13,8 @@
 
 set -e
 
-# Change to Phase 3 directory
-cd /home/petr/jetson/phase3
+# Change to core directory
+cd /home/petr/jetson/core
 
 # Activate isolated environment
 if [[ ! -d "mcp_env" ]]; then
@@ -25,4 +25,4 @@ fi
 source mcp_env/bin/activate
 
 # Launch MCP server
-exec python3 mcp_server_minimal.py
+exec python3 mcp_unified_server.py

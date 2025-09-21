@@ -5,7 +5,7 @@
 
 set -e
 
-cd /home/petr/jetson/phase3
+cd /home/petr/jetson/core
 
 if [[ ! -d "mcp_env" ]]; then
     echo "Error: mcp_env not found. Run ./setup.sh first" >&2
