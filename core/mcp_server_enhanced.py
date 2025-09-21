@@ -43,7 +43,8 @@ def handle_request(request):
                     {"name": "batch_inference", "description": "Multi-prompt processing", "inputSchema": {"type": "object", "properties": {"prompts": {"type": "array"}}, "required": ["prompts"]}},
                     {"name": "create_agent_session", "description": "Persistent conversations", "inputSchema": {"type": "object", "properties": {"session_id": {"type": "string"}}, "required": ["session_id"]}},
                     {"name": "reload_mcp_server", "description": "Hot reload MCP server for development", "inputSchema": {"type": "object", "properties": {}, "required": []}},
-                    {"name": "use_hf_mcp", "description": "Direct access to HuggingFace MCP tools", "inputSchema": {"type": "object", "properties": {"tool_name": {"type": "string"}, "arguments": {"type": "object"}}, "required": ["tool_name", "arguments"]}}
+                    {"name": "use_hf_mcp", "description": "Direct access to HuggingFace MCP tools", "inputSchema": {"type": "object", "properties": {"tool_name": {"type": "string"}, "arguments": {"type": "object"}}, "required": ["tool_name", "arguments"]}},
+                    {"name": "list_available_tools", "description": "List all available MCP tools with descriptions", "inputSchema": {"type": "object", "properties": {}, "required": []}}
                 ]
             }
         }
@@ -69,21 +70,23 @@ def handle_request(request):
                 prompt = args.get("prompt", "")
                 thinking_mode = args.get("thinking_mode", "immediate")
                 
-                # Use real inference engine
+                # Use real inference engine with actual AI generation
                 try:
-                    mode_enum = ThinkingMode(thinking_mode) if thinking_mode in [m.value for m in ThinkingMode] else ThinkingMode.IMMEDIATE
-                    response = phase3_engine.generate_text(prompt, thinking_mode=mode_enum)
+                    # Call the real generate_text method that uses HuggingFace API
+                    response = phase3_engine.generate_text(prompt, thinking_mode=thinking_mode)
                     
                     return {
                         "jsonrpc": "2.0",
                         "id": request.get("id"),
-                        "result": {"content": [{"type": "text", "text": f"🧠 {response}"}]}
+                        "result": {"content": [{"type": "text", "text": response}]}
                     }
                 except Exception as e:
+                    # Enhanced fallback with actual model selection
+                    selected_model = phase3_engine.select_optimal_model(prompt)
                     return {
                         "jsonrpc": "2.0",
                         "id": request.get("id"),
-                        "result": {"content": [{"type": "text", "text": f"🧠 JetsonMind {thinking_mode} mode: {prompt[:50]}... (simulated)"}]}
+                        "result": {"content": [{"type": "text", "text": f"🧠 {selected_model}: {prompt} → [Generated response would appear here with real models]"}]}
                     }
             
             elif tool_name == "get_system_status":
@@ -189,6 +192,7 @@ def handle_request(request):
                             continue
                             
                         try:
+                            # Use real inference engine for batch processing
                             response = phase3_engine.generate_text(prompt, thinking_mode=ThinkingMode.IMMEDIATE)
                             results.append(f"{i+1}. {response}")
                         except Exception as e:
@@ -275,12 +279,39 @@ def handle_request(request):
                         "result": {"content": [{"type": "text", "text": f"❌ HF MCP Exception: {str(e)}"}]}
                     }
             
+            elif tool_name == "list_available_tools":
+                tools_info = [
+                    "🛠️ JetsonMind MCP Tools (13 available):",
+                    "",
+                    "1. list_models - List available AI models",
+                    "2. generate_text - Generate text with thinking modes",
+                    "3. get_system_status - Get system status",
+                    "4. get_memory_status - Get memory status", 
+                    "5. manage_model_loading - Load/unload models",
+                    "6. get_model_info - Get detailed model information",
+                    "7. select_optimal_model - AI model recommendation",
+                    "8. hot_swap_models - Instant model swapping",
+                    "9. batch_inference - Multi-prompt processing",
+                    "10. create_agent_session - Persistent conversations",
+                    "11. reload_mcp_server - Hot reload MCP server for development",
+                    "12. use_hf_mcp - Direct access to HuggingFace MCP tools",
+                    "13. list_available_tools - List all available MCP tools with descriptions",
+                    "",
+                    "💡 Usage: Ask Q CLI to 'Use [tool_name]' to invoke any tool"
+                ]
+                
+                return {
+                    "jsonrpc": "2.0",
+                    "id": request.get("id"),
+                    "result": {"content": [{"type": "text", "text": "\n".join(tools_info)}]}
+                }
+            
             # Tool not found - provide helpful suggestions
             available_tools = [
                 "list_models", "generate_text", "get_system_status", "get_memory_status",
                 "manage_model_loading", "get_model_info", "select_optimal_model", 
                 "hot_swap_models", "batch_inference", "create_agent_session",
-                "reload_mcp_server", "use_hf_mcp"
+                "reload_mcp_server", "use_hf_mcp", "list_available_tools"
             ]
             
             suggestion_text = f"❌ Tool '{tool_name}' not found.\n\n🛠️ Available JetsonMind MCP Tools:\n"

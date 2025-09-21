@@ -8,7 +8,8 @@ for the unified server to communicate with specialized servers.
 import asyncio
 import logging
 from typing import Dict, Optional
-from mcp.client import Client
+from mcp.client.stdio import stdio_client
+from mcp.client.session import ClientSession
 
 logger = logging.getLogger("mcp-client-pool")
 
@@ -66,7 +67,7 @@ class MCPClientPool:
             logger.error(f"Error connecting to {server_name} server: {e}")
             raise
     
-    async def get_client(self, server_name: str) -> Client:
+    async def get_client(self, server_name: str) -> ClientSession:
         """
         Get MCP client for specified internal server.
         
