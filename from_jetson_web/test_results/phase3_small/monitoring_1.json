@@ -1,0 +1,65 @@
+{
+  "monitoring_data": [
+    {
+      "timestamp": "2025-09-20T23:46:01.638955",
+      "cpu_percent": 0.3,
+      "cpu_temp_c": 53.093,
+      "memory_percent": 30.8,
+      "memory_used_gb": 2.0281295776367188,
+      "memory_available_gb": 5.147865295410156,
+      "disk_used_percent": 6.3,
+      "disk_free_gb": 3374.149215698242,
+      "load_average": 0.4794921875,
+      "gpu_temp_c": 0,
+      "gpu_memory_used_mb": 0,
+      "gpu_memory_total_mb": 0,
+      "gpu_utilization_percent": 0
+    },
+    {
+      "timestamp": "2025-09-20T23:46:07.671395",
+      "cpu_percent": 4.4,
+      "cpu_temp_c": 53.375,
+      "memory_percent": 31.6,
+      "memory_used_gb": 2.0887794494628906,
+      "memory_available_gb": 5.087196350097656,
+      "disk_used_percent": 6.3,
+      "disk_free_gb": 3374.138469696045,
+      "load_average": 0.44091796875,
+      "gpu_temp_c": 0,
+      "gpu_memory_used_mb": 0,
+      "gpu_memory_total_mb": 0,
+      "gpu_utilization_percent": 0
+    },
+    {
+      "timestamp": "2025-09-20T23:46:13.806461",
+      "cpu_percent": 26.2,
+      "cpu_temp_c": 54.0,
+      "memory_percent": 32.1,
+      "memory_used_gb": 2.1269302368164062,
+      "memory_available_gb": 5.048961639404297,
+      "disk_used_percent": 6.3,
+      "disk_free_gb": 3373.698833465576,
+      "load_average": 0.4052734375,
+      "gpu_temp_c": 0,
+      "gpu_memory_used_mb": 0,
+      "gpu_memory_total_mb": 0,
+      "gpu_utilization_percent": 0
+    },
+    {
+      "timestamp": "2025-09-20T23:46:19.840734",
+      "cpu_percent": 4.3,
+      "cpu_temp_c": 53.656,
+      "memory_percent": 52.3,
+      "memory_used_gb": 3.5484161376953125,
+      "memory_available_gb": 3.549457550048828,
+      "disk_used_percent": 6.3,
+      "disk_free_gb": 3373.2180366516113,
+      "load_average": 0.37255859375,
+      "gpu_temp_c": 0,
+      "gpu_memory_used_mb": 0,
+      "gpu_memory_total_mb": 0,
+      "gpu_utilization_percent": 0
+    }
+  ],
+  "alerts": []
+}

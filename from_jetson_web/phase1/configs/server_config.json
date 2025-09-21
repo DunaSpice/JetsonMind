@@ -1,0 +1,37 @@
+{
+    "server": {
+        "host": "0.0.0.0",
+        "port": 8000,
+        "workers": 1
+    },
+    "memory": {
+        "ram_budget_gb": 5.5,
+        "swap_dir": "/tmp/model_swap",
+        "optimization_interval": 60
+    },
+    "models": {
+        "preload": [
+            "Qwen/Qwen2.5-0.5B-Instruct",
+            "Qwen/Qwen2.5-1.5B-Instruct"
+        ],
+        "model_capabilities": {
+            "Qwen/Qwen2.5-0.5B-Instruct": ["general", "chat", "simple"],
+            "Qwen/Qwen2.5-1.5B-Instruct": ["coding", "analysis", "medium"],
+            "Qwen/Qwen2.5-3B-Instruct": ["complex", "reasoning", "large"]
+        }
+    },
+    "monitoring": {
+        "metrics_history_size": 1000,
+        "alert_thresholds": {
+            "ram_percent": 90,
+            "cpu_temp": 80,
+            "gpu_temp": 85,
+            "cpu_percent": 95
+        }
+    },
+    "optimization": {
+        "aggressive_threshold": 0.8,
+        "moderate_threshold": 0.6,
+        "preload_threshold": 0.9
+    }
+}

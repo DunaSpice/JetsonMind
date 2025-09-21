@@ -1,0 +1,62 @@
+{
+  "health_check": {
+    "status": "PASS",
+    "response_time": 0.004635
+  },
+  "status_endpoint": {
+    "status": "PASS",
+    "active_models": 0,
+    "memory_usage": 0.0
+  },
+  "models_endpoint": {
+    "status": "PASS",
+    "active_count": 0,
+    "capabilities_count": 5
+  },
+  "single_inference": {
+    "status": "FAIL",
+    "error": ""
+  },
+  "batch_inference": {
+    "status": "FAIL",
+    "error": ""
+  },
+  "model_loading": {
+    "status": "FAIL",
+    "error": ""
+  },
+  "response_times": {
+    "status": "FAIL",
+    "error": "No successful responses"
+  },
+  "concurrent_requests": {
+    "status": "FAIL",
+    "error": "Only 0/5 requests successful"
+  },
+  "memory_usage": {
+    "status": "PASS",
+    "initial_memory_gb": 0.0,
+    "final_memory_gb": 0.0,
+    "memory_increase_gb": 0.0,
+    "memory_budget_gb": 5.5
+  },
+  "high_load": {
+    "status": "FAIL",
+    "error": "Only 0/3 batches successful"
+  },
+  "memory_pressure": {
+    "status": "FAIL",
+    "error": "System not responsive under memory pressure"
+  },
+  "edge_cases": {
+    "status": "FAIL",
+    "successful_cases": 0,
+    "total_cases": 3
+  },
+  "long_running": {
+    "status": "FAIL",
+    "duration": 30.00046682357788,
+    "successful_requests": 0,
+    "requests_per_second": 0.0
+  }
+}
