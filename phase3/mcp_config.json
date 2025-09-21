@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "phase3-inference": {
+      "command": "python3",
+      "args": ["/home/petr/phase3/mcp_server.py"],
+      "env": {
+        "PYTHONPATH": "/home/petr/phase3"
+      }
+    }
+  }
+}
