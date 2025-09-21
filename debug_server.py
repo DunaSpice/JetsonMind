@@ -1,28 +1,41 @@
 #!/usr/bin/env python3
-"""Debug MCP Server with FastMCP - Full Feature Set"""
+"""Debug MCP Server with FastMCP - Advanced Features"""
 
 import os
 import psutil
 import subprocess
 import json
+import time
 from datetime import datetime
 from pathlib import Path
+from functools import lru_cache
 from mcp.server.fastmcp import FastMCP
 
 # Create FastMCP server
 mcp = FastMCP("jetson-debug")
 
-@mcp.tool()
-def system_status() -> str:
-    """Get basic system status"""
+# Cache for performance
+@lru_cache(maxsize=32)
+def _cached_system_info(timestamp_minute):
+    """Cache system info per minute"""
     uname = os.uname()
     return f"System: {uname.sysname} {uname.machine}, Python: {os.sys.version.split()[0]}"
 
-@mcp.tool()
-def memory_info() -> str:
-    """Get memory usage information"""
+@lru_cache(maxsize=32)
+def _cached_memory_info(timestamp_10sec):
+    """Cache memory info per 10 seconds"""
     mem = psutil.virtual_memory()
     return f"Memory: {mem.total//1024**3}GB total, {mem.available//1024**3}GB available ({mem.percent}% used)"
+
+@mcp.tool()
+def system_status() -> str:
+    """Get basic system status (cached)"""
+    return _cached_system_info(int(time.time() // 60))
+
+@mcp.tool()
+def memory_info() -> str:
+    """Get memory usage information (cached)"""
+    return _cached_memory_info(int(time.time() // 10))
 
 @mcp.tool()
 def process_info() -> str:
@@ -190,6 +203,61 @@ def uptime() -> str:
         return f"Uptime: {result.stdout.strip()}"
     except Exception as e:
         return f"Uptime Error: {str(e)}"
+
+@mcp.tool()
+def tool_help(tool_name: str = "") -> str:
+    """Get help and examples for tools"""
+    help_data = {
+        "file_check": "Usage: file_check('/path')\nExample: file_check('/home/petr')",
+        "run_command": "Usage: run_command('command')\nExample: run_command('df -h')",
+        "service_status": "Usage: service_status('service')\nExample: service_status('ssh')",
+        "log_tail": "Usage: log_tail('/path/to/log', 10)\nExample: log_tail('/var/log/syslog', 5)"
+    }
+    if tool_name:
+        return help_data.get(tool_name, f"No help available for {tool_name}")
+    return "Available help: " + ", ".join(help_data.keys())
+
+@mcp.tool()
+def monitor_dashboard() -> str:
+    """Get real-time system dashboard"""
+    mem = psutil.virtual_memory()
+    disk = psutil.disk_usage('/')
+    cpu = psutil.cpu_percent(interval=1)
+    
+    dashboard = f"""=== SYSTEM DASHBOARD ===
+CPU Usage: {cpu}%
+Memory: {mem.percent}% ({mem.available//1024**3}GB free)
+Disk: {(disk.used/disk.total)*100:.1f}% ({disk.free//1024**3}GB free)
+Processes: {len(psutil.pids())}
+Time: {datetime.now().strftime('%H:%M:%S')}"""
+    return dashboard
+
+@mcp.tool()
+def alert_check() -> str:
+    """Check for system alerts and warnings"""
+    alerts = []
+    
+    # Memory check
+    mem = psutil.virtual_memory()
+    if mem.percent > 90:
+        alerts.append(f"🚨 HIGH MEMORY: {mem.percent}%")
+    elif mem.percent > 80:
+        alerts.append(f"⚠️  Memory Warning: {mem.percent}%")
+    
+    # Disk check
+    disk = psutil.disk_usage('/')
+    disk_percent = (disk.used/disk.total)*100
+    if disk_percent > 95:
+        alerts.append(f"🚨 DISK FULL: {disk_percent:.1f}%")
+    elif disk_percent > 85:
+        alerts.append(f"⚠️  Disk Warning: {disk_percent:.1f}%")
+    
+    # CPU check
+    cpu = psutil.cpu_percent(interval=1)
+    if cpu > 95:
+        alerts.append(f"🚨 HIGH CPU: {cpu}%")
+    
+    return "System Alerts:\n" + ("\n".join(alerts) if alerts else "✅ All systems normal")
 
 def main():
     mcp.run()
