@@ -14,7 +14,7 @@
 
 ### 🏆 What Makes It Complete
 - **Perfect MCP Architecture**: 10/10 tools operational with 96% test success
-- **Real AI Integration**: HuggingFace MCP chaining for actual model inference
+- **Real AI Integration**: HuggingFace MCP with authenticated user token for actual model inference
 - **Q CLI Native Support**: Live integration with Amazon Q CLI (no restart needed)
 - **Production Validated**: Comprehensive testing with automated validation suite
 - **Hot Model Swapping**: Auto-loading functionality for seamless model management
@@ -62,6 +62,10 @@
 ```bash
 # 🎯 Recommended: Start with Core Production System
 cd jetson/core && ./setup.sh && python3 test_comprehensive.py
+
+# 🤗 Setup HuggingFace Integration (requires HF CLI token)
+huggingface-cli login  # Login with your HF token
+q mcp add --name huggingface-mcp --command "/home/petr/jetson/run_hf_mcp.sh"
 
 # 🏗️ Alternative: Explore complete architecture first
 cat docs/reference/ARCHITECTURE_DIAGRAM.md && cat docs/reference/SYSTEM_OUTLINE.md
