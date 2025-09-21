@@ -104,6 +104,93 @@ def git_status() -> str:
     except Exception as e:
         return f"Git Status Error: {str(e)}"
 
+@mcp.tool()
+def network_info() -> str:
+    """Get network interface information"""
+    try:
+        interfaces = psutil.net_if_addrs()
+        stats = psutil.net_if_stats()
+        info = []
+        for name, addrs in interfaces.items():
+            if name != 'lo':  # Skip loopback
+                ip = next((addr.address for addr in addrs if addr.family == 2), "No IP")
+                status = "UP" if stats[name].isup else "DOWN"
+                info.append(f"{name}: {ip} ({status})")
+        return "Network Interfaces:\n" + "\n".join(info)
+    except Exception as e:
+        return f"Network Info Error: {str(e)}"
+
+@mcp.tool()
+def temperature() -> str:
+    """Get system temperature information"""
+    try:
+        temps = psutil.sensors_temperatures()
+        if temps:
+            info = []
+            for name, entries in temps.items():
+                for entry in entries:
+                    info.append(f"{name}: {entry.current}°C")
+            return "Temperature:\n" + "\n".join(info)
+        else:
+            return "Temperature: No sensors found"
+    except Exception as e:
+        return f"Temperature Error: {str(e)}"
+
+@mcp.tool()
+def gpu_info() -> str:
+    """Get NVIDIA GPU information (Jetson specific)"""
+    try:
+        result = subprocess.run(["nvidia-smi", "--query-gpu=name,temperature.gpu,utilization.gpu,memory.used,memory.total", "--format=csv,noheader,nounits"], capture_output=True, text=True, timeout=3)
+        if result.returncode == 0:
+            return f"GPU Info:\n{result.stdout.strip()}"
+        else:
+            return "GPU Info: nvidia-smi not available"
+    except Exception as e:
+        return f"GPU Info Error: {str(e)}"
+
+@mcp.tool()
+def docker_ps() -> str:
+    """List Docker containers"""
+    try:
+        result = subprocess.run(["docker", "ps", "--format", "table {{.Names}}\t{{.Status}}\t{{.Ports}}"], capture_output=True, text=True, timeout=3)
+        if result.returncode == 0:
+            return f"Docker Containers:\n{result.stdout}"
+        else:
+            return "Docker: Not available or no containers"
+    except Exception as e:
+        return f"Docker Error: {str(e)}"
+
+@mcp.tool()
+def service_status(service: str = "ssh") -> str:
+    """Check system service status"""
+    try:
+        result = subprocess.run(["systemctl", "is-active", service], capture_output=True, text=True, timeout=3)
+        status = result.stdout.strip()
+        return f"Service {service}: {status}"
+    except Exception as e:
+        return f"Service Status Error: {str(e)}"
+
+@mcp.tool()
+def log_tail(logfile: str = "/var/log/syslog", lines: int = 10) -> str:
+    """Get last N lines from log file"""
+    try:
+        result = subprocess.run(["tail", f"-{lines}", logfile], capture_output=True, text=True, timeout=3)
+        if result.returncode == 0:
+            return f"Last {lines} lines from {logfile}:\n{result.stdout}"
+        else:
+            return f"Log file {logfile} not accessible"
+    except Exception as e:
+        return f"Log Tail Error: {str(e)}"
+
+@mcp.tool()
+def uptime() -> str:
+    """Get system uptime and load average"""
+    try:
+        result = subprocess.run(["uptime"], capture_output=True, text=True, timeout=3)
+        return f"Uptime: {result.stdout.strip()}"
+    except Exception as e:
+        return f"Uptime Error: {str(e)}"
+
 def main():
     mcp.run()
 
