@@ -41,7 +41,8 @@ def handle_request(request):
                     {"name": "select_optimal_model", "description": "AI model recommendation", "inputSchema": {"type": "object", "properties": {"prompt": {"type": "string"}}, "required": ["prompt"]}},
                     {"name": "hot_swap_models", "description": "Instant model swapping", "inputSchema": {"type": "object", "properties": {"source_model": {"type": "string"}, "target_model": {"type": "string"}}, "required": ["source_model", "target_model"]}},
                     {"name": "batch_inference", "description": "Multi-prompt processing", "inputSchema": {"type": "object", "properties": {"prompts": {"type": "array"}}, "required": ["prompts"]}},
-                    {"name": "create_agent_session", "description": "Persistent conversations", "inputSchema": {"type": "object", "properties": {"session_id": {"type": "string"}}, "required": ["session_id"]}}
+                    {"name": "create_agent_session", "description": "Persistent conversations", "inputSchema": {"type": "object", "properties": {"session_id": {"type": "string"}}, "required": ["session_id"]}},
+                    {"name": "reload_mcp_server", "description": "Hot reload MCP server for development", "inputSchema": {"type": "object", "properties": {}, "required": []}}
                 ]
             }
         }
