@@ -94,5 +94,5 @@ class MCPClient:
         except Exception as e:
             return {"error": f"Search and call error: {str(e)}"}
 
-# HuggingFace MCP client instance
-hf_mcp_client = MCPClient("npx", ["@llmindset/mcp-hfspace"])
+# HuggingFace MCP client instance (official)
+hf_mcp_client = MCPClient("npx", ["huggingface-mcp-server"])
