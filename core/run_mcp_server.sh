@@ -24,5 +24,5 @@ fi
 
 source mcp_env/bin/activate
 
-# Launch perfect MCP server - all 10 tools implemented
-exec python3 mcp_server_perfect.py
+# Launch minimal working MCP server
+exec python3 mcp_server_minimal.py
