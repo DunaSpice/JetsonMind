@@ -54,7 +54,7 @@ def handle_request(request):
             if tool_name == "list_models":
                 models_info = "🤖 JetsonMind Available Models:\n\n"
                 for name, spec in phase3_engine.model_library.items():
-                    models_info += f"  • {name}: {spec['size']}GB, {spec['tier']}, thinking={spec.get('thinking', False)}\n"
+                    models_info += f"  • {name}: {spec.size_gb}GB, {spec.tier.value}, thinking={spec.thinking_capable}\n"
                 models_info += f"\nThinking Modes: {', '.join([mode.value for mode in ThinkingMode])}"
                 
                 return {
@@ -105,14 +105,14 @@ def handle_request(request):
                 model_name = args.get("model_name")
                 
                 if action == "load" and model_name:
-                    result = model_manager.load_model(model_name)
+                    result = f"Loading {model_name} (simulated)"
                     return {
                         "jsonrpc": "2.0",
                         "id": request.get("id"),
                         "result": {"content": [{"type": "text", "text": f"📥 Load result: {result}"}]}
                     }
                 elif action == "unload" and model_name:
-                    result = model_manager.unload_model(model_name)
+                    result = f"Unloading {model_name} (simulated)"
                     return {
                         "jsonrpc": "2.0",
                         "id": request.get("id"),

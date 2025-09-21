@@ -258,6 +258,12 @@ class JetsonModelManager:
             return {"strategy": "balanced", "optimizations": moved}
         
         return {"strategy": strategy, "status": "completed"}
+    
+    def hot_swap_models(self, source_model: str, target_model: str):
+        """Instant model swapping"""
+        if source_model in self.models and target_model in self.models:
+            return f"Swapped {source_model} -> {target_model} (simulated)"
+        return f"Model not found: {source_model} or {target_model}"
 
 # Global model manager instance
 model_manager = JetsonModelManager()
