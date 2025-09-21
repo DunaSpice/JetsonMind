@@ -24,5 +24,5 @@ fi
 
 source mcp_env/bin/activate
 
-# Launch working MCP server - fixed for current library
-exec python3 mcp_server_working.py
+# Launch complete MCP server with initialization
+exec python3 mcp_server_complete.py
