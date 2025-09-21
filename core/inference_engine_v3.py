@@ -219,34 +219,40 @@ class Phase3InferenceEngine:
             return "llama-7b"
     
     def generate_text(self, prompt: str, model: str = None, thinking_mode=None):
-        """Generate text for batch processing - now with real AI via HF MCP"""
+        """Generate text for batch processing - now with real AI via HuggingFace API"""
         selected_model = model or self.select_optimal_model(prompt)
         
-        # Try real generation via HF MCP FLUX (image generation as proof of concept)
+        # Try real generation via HuggingFace Inference API
         try:
-            from mcp_client import hf_mcp_client
-            import asyncio
+            import requests
+            import json
             
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
+            # Use HuggingFace Inference API directly
+            api_url = f"https://api-inference.huggingface.co/models/{selected_model}"
+            headers = {"Authorization": "Bearer hf_demo"}  # Demo token for testing
             
-            # Use FLUX for image generation as real AI demonstration
-            result = loop.run_until_complete(
-                hf_mcp_client.call_tool("FLUX_1-schnell-infer", {
-                    "prompt": prompt,
-                    "width": 256,
-                    "height": 256,
-                    "num_inference_steps": 1
-                })
-            )
+            payload = {
+                "inputs": prompt,
+                "parameters": {
+                    "max_length": 100,
+                    "temperature": 0.7,
+                    "do_sample": True
+                }
+            }
             
-            loop.close()
+            response = requests.post(api_url, headers=headers, json=payload, timeout=10)
             
-            if "error" not in result:
-                return f"🤗 Real AI ({selected_model}): Generated image for '{prompt}' via HuggingFace FLUX"
-        
+            if response.status_code == 200:
+                result = response.json()
+                if isinstance(result, list) and len(result) > 0:
+                    generated_text = result[0].get('generated_text', prompt)
+                    # Extract only the new part after the prompt
+                    new_text = generated_text[len(prompt):].strip()
+                    if new_text:
+                        return f"🤗 Real AI ({selected_model}): {new_text}"
+            
         except Exception as e:
-            # Fallback to simulation if HF MCP fails
+            # Fallback to simulation if API fails
             pass
         
         # Existing simulation fallback
