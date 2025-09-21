@@ -42,7 +42,8 @@ def handle_request(request):
                     {"name": "hot_swap_models", "description": "Instant model swapping", "inputSchema": {"type": "object", "properties": {"source_model": {"type": "string"}, "target_model": {"type": "string"}}, "required": ["source_model", "target_model"]}},
                     {"name": "batch_inference", "description": "Multi-prompt processing", "inputSchema": {"type": "object", "properties": {"prompts": {"type": "array"}}, "required": ["prompts"]}},
                     {"name": "create_agent_session", "description": "Persistent conversations", "inputSchema": {"type": "object", "properties": {"session_id": {"type": "string"}}, "required": ["session_id"]}},
-                    {"name": "reload_mcp_server", "description": "Hot reload MCP server for development", "inputSchema": {"type": "object", "properties": {}, "required": []}}
+                    {"name": "reload_mcp_server", "description": "Hot reload MCP server for development", "inputSchema": {"type": "object", "properties": {}, "required": []}},
+                    {"name": "use_hf_mcp", "description": "Direct access to HuggingFace MCP tools", "inputSchema": {"type": "object", "properties": {"tool_name": {"type": "string"}, "arguments": {"type": "object"}}, "required": ["tool_name", "arguments"]}}
                 ]
             }
         }
@@ -190,6 +191,42 @@ def handle_request(request):
                     "id": request.get("id"),
                     "result": {"content": [{"type": "text", "text": f"🤖 Agent session '{session_id}' created with llama-7b"}]}
                 }
+            
+            elif tool_name == "use_hf_mcp":
+                hf_tool_name = args.get("tool_name")
+                hf_arguments = args.get("arguments", {})
+                
+                try:
+                    from mcp_client import hf_mcp_client
+                    import asyncio
+                    
+                    # Call HF MCP tool directly
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
+                    result = loop.run_until_complete(
+                        hf_mcp_client.call_tool(hf_tool_name, hf_arguments)
+                    )
+                    loop.close()
+                    
+                    if "error" not in result:
+                        return {
+                            "jsonrpc": "2.0",
+                            "id": request.get("id"),
+                            "result": {"content": [{"type": "text", "text": f"🤗 HF MCP Result: {result}"}]}
+                        }
+                    else:
+                        return {
+                            "jsonrpc": "2.0",
+                            "id": request.get("id"),
+                            "result": {"content": [{"type": "text", "text": f"❌ HF MCP Error: {result.get('error', 'Unknown error')}"}]}
+                        }
+                
+                except Exception as e:
+                    return {
+                        "jsonrpc": "2.0",
+                        "id": request.get("id"),
+                        "result": {"content": [{"type": "text", "text": f"❌ HF MCP Exception: {str(e)}"}]}
+                    }
         
         except Exception as e:
             return {

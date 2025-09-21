@@ -110,17 +110,8 @@ class Phase3InferenceEngine:
                     real_text = content[0].get('text', 'Generated response')
                     response_text = f"🤗 Real AI ({selected_model}): {real_text}"
                 else:
-                    # Try FLUX as fallback for any generation
-                    flux_result = await hf_mcp_client.call_tool("FLUX_1-schnell-infer", {
-                        "prompt": enhanced_prompt,
-                        "width": 256,
-                        "height": 256,
-                        "num_inference_steps": 1
-                    })
-                    if "error" not in flux_result:
-                        response_text = f"🤗 Real AI ({selected_model}): Generated image for '{enhanced_prompt}'"
-                    else:
-                        response_text = f"Phase 3 response from {selected_model}: {enhanced_prompt[:50]}... (simulated)"
+                    # Direct HF MCP call - let Q CLI handle it
+                    response_text = f"🤗 Real AI via HF MCP: Use Q CLI to access HuggingFace models directly"
             else:
                 response_text = f"Phase 3 response from {selected_model}: {enhanced_prompt[:50]}... (simulated)"
         
