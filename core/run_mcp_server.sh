@@ -24,5 +24,5 @@ fi
 
 source mcp_env/bin/activate
 
-# Launch Enhanced MCP server with full inference capabilities
-exec python3 mcp_inference_enhanced.py
+# Launch perfect MCP server - all 10 tools implemented
+exec python3 mcp_server_perfect.py

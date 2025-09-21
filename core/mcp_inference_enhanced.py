@@ -45,7 +45,7 @@ class EnhancedJetsonMindMCP:
         """Setup comprehensive MCP tools for inference engine"""
         
         @self.app.list_tools()
-        async def list_tools() -> List[Tool]:
+        def list_tools() -> List[Tool]:
             return [
                 # Core Inference Tools
                 Tool(
@@ -368,11 +368,20 @@ class EnhancedJetsonMindMCP:
 
 async def main():
     """Start enhanced MCP server"""
+    import sys
+    from mcp.server.stdio import stdio_server
+    
     try:
         logger.info("Starting Enhanced JetsonMind MCP Server")
         server = EnhancedJetsonMindMCP()
         logger.info("Enhanced MCP server ready - full inference engine capabilities exposed")
-        await server.app.run()
+        
+        async with stdio_server() as (read_stream, write_stream):
+            await server.app.run(
+                read_stream, 
+                write_stream, 
+                server.app.create_initialization_options()
+            )
     except KeyboardInterrupt:
         logger.info("Server shutdown requested")
     except Exception as e:
