@@ -129,7 +129,14 @@ def handle_request(request):
             elif tool_name == "get_model_info":
                 model_name = args.get("model_name")
                 if model_name in phase3_engine.model_library:
-                    info = phase3_engine.model_library[model_name]
+                    spec = phase3_engine.model_library[model_name]
+                    info = {
+                        "name": spec.name,
+                        "size_gb": spec.size_gb,
+                        "tier": spec.tier.value,
+                        "capabilities": spec.capabilities,
+                        "thinking_capable": spec.thinking_capable
+                    }
                     return {
                         "jsonrpc": "2.0",
                         "id": request.get("id"),
