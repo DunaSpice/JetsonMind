@@ -22,26 +22,30 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    JetsonMind Ecosystem                         │
-├─────────────────┬─────────────────┬─────────────────────────────┤
-│   CLI Tools     │  Web Interface  │     Direct Integration      │
-│   (MCP/Q CLI)   │   (REST API)    │     (Python Import)         │
-└─────────────────┴─────────────────┴─────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│              Production MCP Server (Phase 3)                    │
-│  ⚡ <1s startup │ 🎯 Smart routing │ 📊 Health monitoring      │
+│                    Any AI Client                                │
+│  ┌─────────────┬─────────────┬─────────────┬─────────────────┐  │
+│  │  Q CLI      │  Web App    │  Mobile App │  Custom AI/LLM  │  │
+│  │  (Amazon Q) │  (Browser)  │  (Native)   │  (Any Client)   │  │
+│  └─────────────┴─────────────┴─────────────┴─────────────────┘  │
 └─────────────────────────────────────────────────────────────────┘
                               │
-                              ▼
+                              ▼ MCP Protocol (JSON-RPC 2.0)
 ┌─────────────────────────────────────────────────────────────────┐
-│                Hardware Acceleration Layer                      │
-│  🚀 CUDA Cores │ ⚡ TensorRT │ 🧠 Jetson APIs │ 💾 Memory Opt │
+│              JetsonMind Unified MCP Server                      │
+│                 (Single Point of Entry)                         │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼ Internal MCP Protocol
+┌─────────────────────────────────────────────────────────────────┐
+│                Internal MCP Server Mesh                         │
+│  ┌─────────────┬─────────────┬─────────────┬─────────────────┐  │
+│  │   AI MCP    │ System MCP  │  Data MCP   │ Hardware MCP    │  │
+│  │   Server    │   Server    │   Server    │   Server        │  │
+│  └─────────────┴─────────────┴─────────────┴─────────────────┘  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**📋 [Complete Architecture Diagram](docs/reference/ARCHITECTURE_DIAGRAM.md)** | **📊 [Detailed System Outline](docs/reference/SYSTEM_OUTLINE.md)**
+**📋 [Complete Architecture Diagram](docs/reference/ARCHITECTURE_DIAGRAM.md)** | **📊 [Nested MCP Design](MCP_NESTED_ARCHITECTURE.md)**
 
 ## 🚀 Quick Start
 
@@ -58,18 +62,18 @@ cat docs/reference/ARCHITECTURE_DIAGRAM.md && cat docs/reference/SYSTEM_OUTLINE.
 > **Note**: This repository now contains all Phase 2 development work in the `legacy/` section, providing complete historical context and alternative implementations alongside the production-ready core system.
 
 ### 🧠 Core Production System (`core/`) - **PRODUCTION READY** ⭐
-**The flagship production system** - Start here for immediate deployment
+**Nested MCP architecture with unified interface** - Start here for immediate deployment
 - **Status**: ✅ Operational (loads in <1s, 99.9%+ reliability)
-- **MCP Server**: Robust JSON-RPC 2.0 interface for CLI integration
-- **Inference Engine**: Intelligent model selection and hardware optimization
-- **Documentation**: Complete API reference and operational guides
+- **Unified MCP Server**: Single interface exposing all JetsonMind capabilities
+- **Internal MCP Mesh**: Specialized servers for AI, System, Data, and Hardware
+- **Any AI Client**: Q CLI, Web, Mobile, Custom LLMs - all use same MCP interface
 - **Performance**: Nano 150ms, Orin 50ms, Xavier 80ms inference times
 
 **Quick Commands:**
 ```bash
 cd core && ./setup.sh                      # Complete setup
 python3 test_comprehensive.py              # Validate system
-python3 mcp_server_minimal.py             # Start MCP server
+python3 mcp_unified_server.py             # Start unified MCP server
 ```
 
 ### 🏗️ Architecture Documentation - **COMPREHENSIVE** 📋
