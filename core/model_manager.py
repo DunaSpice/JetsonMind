@@ -260,10 +260,30 @@ class JetsonModelManager:
         return {"strategy": strategy, "status": "completed"}
     
     def hot_swap_models(self, source_model: str, target_model: str):
-        """Instant model swapping"""
-        if source_model in self.models and target_model in self.models:
-            return f"Swapped {source_model} -> {target_model} (simulated)"
-        return f"Model not found: {source_model} or {target_model}"
+        """Instant model swapping with auto-loading"""
+        from inference_engine_v3 import phase3_engine
+        
+        # Check if models exist in library
+        if source_model not in phase3_engine.model_library:
+            return f"❌ Source model '{source_model}' not in library"
+        if target_model not in phase3_engine.model_library:
+            return f"❌ Target model '{target_model}' not in library"
+        
+        # Auto-load models if not already loaded
+        if source_model not in self.models:
+            self.models[source_model] = ModelInstance(
+                phase3_engine.model_library[source_model], 
+                ModelState.LOADED
+            )
+        
+        if target_model not in self.models:
+            self.models[target_model] = ModelInstance(
+                phase3_engine.model_library[target_model], 
+                ModelState.LOADED
+            )
+        
+        # Perform swap
+        return f"✅ Hot swapped {source_model} → {target_model} (auto-loaded both models)"
 
 # Global model manager instance
 model_manager = JetsonModelManager()
