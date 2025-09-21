@@ -60,6 +60,39 @@ class MCPClient:
             
         except Exception as e:
             return {"error": f"MCP client error: {str(e)}"}
+    
+    async def search_and_call_space(self, query: str, input_text: str):
+        """Search for a space and call it with input"""
+        try:
+            # First search for appropriate space
+            search_result = await self.call_tool("search-spaces", {"query": query})
+            
+            if "error" in search_result:
+                return search_result
+            
+            # Extract first space ID from search results
+            content = search_result.get('content', [{}])[0].get('text', '')
+            if 'glt3953/app-text_generation_chatglm2-6b' in content:
+                # Use the found text generation space
+                space_id = "glt3953/app-text_generation_chatglm2-6b"
+                
+                # Call the space (try common endpoint patterns)
+                for endpoint in ["infer", "predict", "generate"]:
+                    try:
+                        result = await self.call_tool(f"{space_id.replace('/', '_')}-{endpoint}", {
+                            "input": input_text,
+                            "text": input_text,
+                            "prompt": input_text
+                        })
+                        if "error" not in result:
+                            return result
+                    except:
+                        continue
+            
+            return {"error": "No suitable text generation space found"}
+            
+        except Exception as e:
+            return {"error": f"Search and call error: {str(e)}"}
 
 # HuggingFace MCP client instance
 hf_mcp_client = MCPClient("npx", ["@llmindset/mcp-hfspace"])

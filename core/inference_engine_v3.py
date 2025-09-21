@@ -100,19 +100,28 @@ class Phase3InferenceEngine:
         try:
             from mcp_client import hf_mcp_client
             
-            # Use HF MCP search to find appropriate space, then use FLUX for generation
-            result = await hf_mcp_client.call_tool("FLUX_1-schnell-infer", {
-                "prompt": enhanced_prompt,
-                "width": 512,
-                "height": 512,
-                "num_inference_steps": 2
-            })
+            # Use smart search and call for text generation
+            result = await hf_mcp_client.search_and_call_space("text generation chat", enhanced_prompt)
             
             if "error" not in result:
-                # HF MCP returns image generation, adapt for text
-                response_text = f"🤗 Real AI ({selected_model}): Generated image for '{enhanced_prompt}'"
+                # Extract response from HF MCP result
+                content = result.get('content', [{}])
+                if content and len(content) > 0:
+                    real_text = content[0].get('text', 'Generated response')
+                    response_text = f"🤗 Real AI ({selected_model}): {real_text}"
+                else:
+                    # Try FLUX as fallback for any generation
+                    flux_result = await hf_mcp_client.call_tool("FLUX_1-schnell-infer", {
+                        "prompt": enhanced_prompt,
+                        "width": 256,
+                        "height": 256,
+                        "num_inference_steps": 1
+                    })
+                    if "error" not in flux_result:
+                        response_text = f"🤗 Real AI ({selected_model}): Generated image for '{enhanced_prompt}'"
+                    else:
+                        response_text = f"Phase 3 response from {selected_model}: {enhanced_prompt[:50]}... (simulated)"
             else:
-                # Fallback to simulation
                 response_text = f"Phase 3 response from {selected_model}: {enhanced_prompt[:50]}... (simulated)"
         
         except Exception as e:
@@ -227,21 +236,19 @@ class Phase3InferenceEngine:
             from mcp_client import hf_mcp_client
             import asyncio
             
-            # Call HF MCP for real generation (using FLUX for demo)
+            # Use smart search and call for text generation
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             result = loop.run_until_complete(
-                hf_mcp_client.call_tool("FLUX_1-schnell-infer", {
-                    "prompt": prompt,
-                    "width": 256,
-                    "height": 256,
-                    "num_inference_steps": 1
-                })
+                hf_mcp_client.search_and_call_space("text generation", prompt)
             )
             loop.close()
             
             if "error" not in result:
-                return f"🤗 Real AI ({selected_model}): Generated image for '{prompt}'"
+                content = result.get('content', [{}])
+                if content and len(content) > 0:
+                    real_text = content[0].get('text', 'Generated response')
+                    return f"🤗 Real AI ({selected_model}): {real_text}"
         
         except Exception as e:
             # Fallback to simulation if HF MCP fails
