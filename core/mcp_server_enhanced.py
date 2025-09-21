@@ -274,6 +274,26 @@ def handle_request(request):
                         "id": request.get("id"),
                         "result": {"content": [{"type": "text", "text": f"❌ HF MCP Exception: {str(e)}"}]}
                     }
+            
+            # Tool not found - provide helpful suggestions
+            available_tools = [
+                "list_models", "generate_text", "get_system_status", "get_memory_status",
+                "manage_model_loading", "get_model_info", "select_optimal_model", 
+                "hot_swap_models", "batch_inference", "create_agent_session",
+                "reload_mcp_server", "use_hf_mcp"
+            ]
+            
+            suggestion_text = f"❌ Tool '{tool_name}' not found.\n\n🛠️ Available JetsonMind MCP Tools:\n"
+            for tool in available_tools:
+                suggestion_text += f"• {tool}\n"
+            
+            suggestion_text += f"\n💡 Try: 'Use list_models to check available models'"
+            
+            return {
+                "jsonrpc": "2.0",
+                "id": request.get("id"),
+                "result": {"content": [{"type": "text", "text": suggestion_text}]}
+            }
         
         except Exception as e:
             return {
