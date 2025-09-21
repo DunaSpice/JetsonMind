@@ -55,6 +55,8 @@ cat docs/reference/ARCHITECTURE_DIAGRAM.md && cat docs/reference/SYSTEM_OUTLINE.
 
 ## 📦 Repository Components
 
+> **Note**: This repository now contains all Phase 2 development work in the `legacy/` section, providing complete historical context and alternative implementations alongside the production-ready core system.
+
 ### 🧠 Core Production System (`core/`) - **PRODUCTION READY** ⭐
 **The flagship production system** - Start here for immediate deployment
 - **Status**: ✅ Operational (loads in <1s, 99.9%+ reliability)
@@ -90,17 +92,18 @@ cd jetson-containers && ./install.sh       # Install container system
 ./run.sh --container pytorch              # Launch PyTorch container
 ```
 
-### 🌐 Web System (`legacy/web-system/`) - **ALTERNATIVE INTERFACE**
-**Web-based AI system** - Browser interface and REST API access
-- **Phase 1**: Basic inference system with web UI
-- **Phase 2**: Advanced model management and batch processing
-- **Docker Deployment**: Complete containerized web stack
-- **Test Results**: Comprehensive validation data and benchmarks
+### 🌐 Legacy Systems (`legacy/`) - **ARCHIVED IMPLEMENTATIONS**
+**Historical development phases** - Reference implementations and alternative approaches
+- **Phase 1 & 2**: Complete web-based AI system implementations in `legacy/web-system/`
+- **Phase 2 Work**: All Phase 2 development and testing in `legacy/phase2/`
+- **Docker Deployment**: Complete containerized web stack with comprehensive test results
+- **Historical Value**: Benchmarks, performance data, and alternative architecture approaches
 
 **Quick Commands:**
 ```bash
-cd legacy/web-system && docker-compose up  # Launch web interface
-curl localhost:8080/api/generate           # Test REST API
+cd legacy/web-system && docker-compose up  # Launch Phase 1/2 web interface
+cd legacy/phase2                           # Explore Phase 2 development work
+curl localhost:8080/api/generate           # Test legacy REST API
 ```
 
 ### 🔧 Development Environment (`jetson-env/`) - **ISOLATED SETUP**
@@ -113,15 +116,15 @@ curl localhost:8080/api/generate           # Test REST API
 
 | Component | Startup Time | Memory Usage | Inference Speed | Use Case |
 |-----------|--------------|--------------|-----------------|----------|
-| **Phase 3 MCP** | <1s | ~1GB | 50-150ms | **Production CLI** |
+| **Core MCP** | <1s | ~1GB | 50-150ms | **Production CLI** |
 | **Jetson Containers** | <3s | 6-8GB | 30-100ms | **Maximum Performance** |
-| **Web System** | <5s | ~2GB | 100-200ms | **Browser Interface** |
+| **Legacy Systems** | <5s | ~2GB | 100-200ms | **Web Interface** |
 | **Development Env** | <2s | ~500MB | Variable | **Development** |
 
 ## 🎯 Hardware Compatibility
 
-| Device | Memory | CUDA Cores | Phase 3 | Containers | Web System | Performance |
-|--------|--------|------------|---------|------------|------------|-------------|
+| Device | Memory | CUDA Cores | Core | Containers | Legacy | Performance |
+|--------|--------|------------|------|------------|--------|-------------|
 | **Jetson Nano** | 4GB | 128 | ✅ | ⚠️ Limited | ✅ | ⭐⭐⭐ |
 | **Jetson Orin NX** | 8/16GB | 1024 | ✅ | ✅ | ✅ | ⭐⭐⭐⭐⭐ |
 | **Jetson Xavier NX** | 8GB | 384 | ✅ | ✅ | ✅ | ⭐⭐⭐⭐ |
@@ -152,7 +155,7 @@ curl localhost:8080/api/generate           # Test REST API
 ### 🎯 Component Documentation  
 - **[Core Production System](core/README.md)** - Production system (RECOMMENDED)
 - **[Jetson Containers](jetson-containers/README.md)** - Hardware acceleration
-- **[Web System](legacy/web-system/README.md)** - Web interface components
+- **[Legacy Systems](legacy/web-system/README.md)** - Web interface and Phase 2 work
 - **[Environment Setup](jetson-env/README.md)** - Python environment
 
 ### 📋 Planning & Roadmap
