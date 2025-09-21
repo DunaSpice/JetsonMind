@@ -24,5 +24,5 @@ fi
 
 source mcp_env/bin/activate
 
-# Launch complete MCP server with initialization
-exec python3 mcp_server_complete.py
+# Launch enhanced MCP server with real inference engine
+exec python3 mcp_server_enhanced.py
