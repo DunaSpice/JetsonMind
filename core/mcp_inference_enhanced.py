@@ -21,6 +21,7 @@ from typing import List, Dict, Any, Optional
 from mcp.server import Server
 from mcp.types import Tool, TextContent
 from inference_engine_v3 import phase3_engine, ThinkingMode, ModelTier
+from model_manager import model_manager
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("jetsonmind-enhanced-mcp")
@@ -31,7 +32,14 @@ class EnhancedJetsonMindMCP:
     def __init__(self):
         self.app = Server("jetsonmind-enhanced")
         self.engine = phase3_engine
+        self.model_manager = model_manager
+        self._initialize_models()
         self.setup_tools()
+    
+    def _initialize_models(self):
+        """Register all models with the model manager"""
+        for name, spec in self.engine.model_library.items():
+            self.model_manager.register_model(name, spec)
     
     def setup_tools(self):
         """Setup comprehensive MCP tools for inference engine"""
@@ -103,14 +111,36 @@ class EnhancedJetsonMindMCP:
                 
                 Tool(
                     name="manage_model_loading",
-                    description="Load/unload models for memory optimization",
+                    description="Advanced model loading/unloading with hot swapping and storage tiers",
                     inputSchema={
                         "type": "object",
                         "properties": {
-                            "action": {"type": "string", "enum": ["load", "unload", "status"]},
-                            "model_name": {"type": "string", "description": "Model to manage"}
+                            "action": {"type": "string", "enum": ["load", "unload", "status", "hot_swap"]},
+                            "model_name": {"type": "string", "description": "Model to manage"},
+                            "force_tier": {"type": "string", "enum": ["RAM", "SWAP", "STORAGE"], "description": "Force specific memory tier"},
+                            "to_storage": {"type": "boolean", "description": "Cache to storage when unloading"}
                         },
                         "required": ["action"]
+                    }
+                ),
+                
+                Tool(
+                    name="get_memory_status",
+                    description="Get detailed memory usage across RAM/SWAP/Storage tiers",
+                    inputSchema={"type": "object", "properties": {}}
+                ),
+                
+                Tool(
+                    name="hot_swap_models",
+                    description="Hot swap models between memory tiers for optimization",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "source_model": {"type": "string", "description": "Model to swap out"},
+                            "target_model": {"type": "string", "description": "Model to swap in"},
+                            "target_tier": {"type": "string", "enum": ["RAM", "SWAP", "STORAGE"]}
+                        },
+                        "required": ["source_model", "target_model"]
                     }
                 ),
                 
@@ -280,48 +310,54 @@ class EnhancedJetsonMindMCP:
                 elif name == "manage_model_loading":
                     action = arguments["action"]
                     model_name = arguments.get("model_name")
+                    force_tier = arguments.get("force_tier")
+                    to_storage = arguments.get("to_storage", False)
                     
                     if action == "status":
-                        status = {
-                            "loaded_models": list(self.engine.active_models.keys()),
-                            "available_models": list(self.engine.model_library.keys())
-                        }
+                        status = self.model_manager.get_memory_status()
                         return [TextContent(type="text", text=json.dumps(status, indent=2))]
                     
                     elif action == "load" and model_name:
-                        if model_name in self.engine.model_library:
-                            self.engine.active_models[model_name] = {"loaded_at": asyncio.get_event_loop().time()}
-                            return [TextContent(type="text", text=f"Model '{model_name}' loaded")]
-                        else:
-                            return [TextContent(type="text", text=f"Model '{model_name}' not found")]
+                        result = await self.model_manager.load_model(model_name, force_tier)
+                        return [TextContent(type="text", text=json.dumps(result, indent=2))]
                     
                     elif action == "unload" and model_name:
-                        if model_name in self.engine.active_models:
-                            del self.engine.active_models[model_name]
-                            return [TextContent(type="text", text=f"Model '{model_name}' unloaded")]
-                        else:
-                            return [TextContent(type="text", text=f"Model '{model_name}' not loaded")]
+                        result = await self.model_manager.unload_model(model_name, to_storage)
+                        return [TextContent(type="text", text=json.dumps(result, indent=2))]
+                    
+                    elif action == "hot_swap":
+                        # Hot swap: unload one, load another
+                        if model_name:
+                            unload_result = await self.model_manager.unload_model(model_name, to_storage=True)
+                            # Could load another model here
+                            return [TextContent(type="text", text=json.dumps(unload_result, indent=2))]
+                
+                elif name == "get_memory_status":
+                    status = self.model_manager.get_memory_status()
+                    return [TextContent(type="text", text=json.dumps(status, indent=2))]
+                
+                elif name == "hot_swap_models":
+                    source_model = arguments["source_model"]
+                    target_model = arguments["target_model"]
+                    target_tier = arguments.get("target_tier")
+                    
+                    # Unload source model to storage
+                    unload_result = await self.model_manager.unload_model(source_model, to_storage=True)
+                    
+                    # Load target model
+                    load_result = await self.model_manager.load_model(target_model, target_tier)
+                    
+                    swap_result = {
+                        "hot_swap_completed": True,
+                        "unloaded": unload_result,
+                        "loaded": load_result
+                    }
+                    return [TextContent(type="text", text=json.dumps(swap_result, indent=2))]
                 
                 elif name == "optimize_memory":
                     strategy = arguments.get("strategy", "balanced")
-                    
-                    if strategy == "aggressive":
-                        # Unload all but essential models
-                        essential = ["gpt2-small"]
-                        unloaded = []
-                        for model in list(self.engine.active_models.keys()):
-                            if model not in essential:
-                                del self.engine.active_models[model]
-                                unloaded.append(model)
-                        
-                        return [TextContent(type="text", text=json.dumps({
-                            "strategy": "aggressive",
-                            "unloaded_models": unloaded,
-                            "remaining_models": list(self.engine.active_models.keys())
-                        }, indent=2))]
-                    
-                    else:
-                        return [TextContent(type="text", text=f"Memory optimization with '{strategy}' strategy completed")]
+                    result = await self.model_manager.optimize_memory(strategy)
+                    return [TextContent(type="text", text=json.dumps(result, indent=2))]
                 
                 else:
                     return [TextContent(type="text", text=f"Unknown tool: {name}")]
